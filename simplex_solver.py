@@ -3,10 +3,11 @@
 import argparse
 
 import numpy as np
+from typing import List, Tuple, Union, Optional, Any
 from scipy.optimize import linprog
 
 
-def parse_command_line_args():
+def parse_command_line_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Read matrix A, vectors b and c from the command line.")
 
@@ -25,7 +26,8 @@ def parse_command_line_args():
 
 
 # TODO: when 0... is not a BFS
-def solve(A, b, c, verbose):
+def solve(A: np.ndarray, b: np.ndarray, c: np.ndarray, verbose: bool) -> \
+        tuple[None, None] | tuple[list[Any], np.ndarray[Any, Any]]:
     T, m, n = construct_simplex_tableau(A, b, c)
 
     if verbose:
@@ -87,7 +89,7 @@ def solve(A, b, c, verbose):
     return (list(result), T[-1][-1])
 
 
-def construct_simplex_tableau(A, b, c):
+def construct_simplex_tableau(A: np.ndarray, b: np.ndarray, c: np.ndarray) -> Tuple[np.ndarray, int, int]:
     n = len(A) + 1
     m = len(A[0]) + len(b) + 1
     T = np.zeros((n, m), dtype=float)
@@ -103,7 +105,7 @@ def construct_simplex_tableau(A, b, c):
     return T, m, n
 
 
-def find_enter_variable(T_z):
+def find_enter_variable(T_z: np.ndarray) -> Optional[int]:
     def get_max_abs(x):
         return abs(x) if x < 0 else 0
 
@@ -119,7 +121,7 @@ def find_enter_variable(T_z):
     return pivot_col_i
 
 
-def find_exit_variable(T, pivot_col_i, b, tolerance=1e-9):
+def find_exit_variable(T: np.ndarray, pivot_col_i: int, b: np.ndarray, tolerance: float = 1e-9) -> Optional[int]:
     curr_min = None
     pivot_row_i = None
     for i in range(len(b)):
@@ -134,7 +136,7 @@ def find_exit_variable(T, pivot_col_i, b, tolerance=1e-9):
     return pivot_row_i
 
 
-def is_basic_variable(T, j):
+def is_basic_variable(T: np.ndarray, j: int) -> Tuple[bool, Optional[int]]:
     num_zeros = 0
     num_ones = 0
     row_i_one = None

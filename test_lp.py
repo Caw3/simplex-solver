@@ -7,6 +7,8 @@ from scipy.optimize import linprog
 class TestLP(unittest.TestCase):
     def assertLP(self, A, b, c):
         np.set_printoptions(precision=3, suppress=True)
+        print(
+            '\n---------------------------------------------------------------------------')
         result = solve(A, b, c, verbose=True)
         expected = linprog(-c, A_ub=A, b_ub=b)
         self.assertEqual(result[1], -expected.fun)
@@ -14,8 +16,6 @@ class TestLP(unittest.TestCase):
         print('scikit.linprog: ', list(expected.x), -expected.fun)
         self.assertEqual(np.sum(c * result[0]), result[1])
         self.assertEqual(np.sum(c * result[0]), -expected.fun)
-        print(
-            '\n---------------------------------------------------------------------------')
 
     def test_sanity(self):
         A = np.array([[4, 2], [2, 3]])
