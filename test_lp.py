@@ -3,17 +3,19 @@ import numpy as np
 from simplex_solver import solve
 from scipy.optimize import linprog
 
+
 class TestLP(unittest.TestCase):
     def assertLP(self, A, b, c):
-        print(
-            '\n---------------------------------------------------------------------------')
+        np.set_printoptions(precision=3, suppress=True)
         result = solve(A, b, c, verbose=True)
         expected = linprog(-c, A_ub=A, b_ub=b)
         self.assertEqual(result[1], -expected.fun)
-        print(result)
-        print(list(expected.x), -expected.fun)
+        print('Solution:       ', result[0], result[1])
+        print('scikit.linprog: ', list(expected.x), -expected.fun)
         self.assertEqual(np.sum(c * result[0]), result[1])
         self.assertEqual(np.sum(c * result[0]), -expected.fun)
+        print(
+            '\n---------------------------------------------------------------------------')
 
     def test_sanity(self):
         A = np.array([[4, 2], [2, 3]])
@@ -86,7 +88,6 @@ class TestLP(unittest.TestCase):
     #     b = np.array([-1, 4])
     #     c = np.array([-1, -2])
     #     self.assertLP(A, b, c)
-
 
 
 def run_tests():
