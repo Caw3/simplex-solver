@@ -4,6 +4,8 @@ import argparse
 
 import numpy as np
 from scipy.optimize import linprog
+
+
 def parse_command_line_args():
     parser = argparse.ArgumentParser(
         description="Read matrix A, vectors b and c from the command line.")
@@ -24,22 +26,7 @@ def parse_command_line_args():
 
 # TODO: when 0... is not a BFS
 def solve(A, b, c, verbose):
-    n = len(A) + 1
-    m = len(A[0]) + len(b) + 1
-    T = np.zeros((n, m), dtype=float)
-
-    for i in range(len(A)):
-        for j in range(len(A[0])):
-            T[i][j] = A[i][j]
-
-    for i in range(len(A[0])):
-        T[i][len(A[0]) + i] = 1
-
-    for i in range(len(b)):
-        T[i][len(A[0]) + len(b)] = b[i]
-
-    for i in range(len(c)):
-        T[len(A)][i] = -c[i]
+    T, m, n = construct_simplex_tableau(A, b, c)
 
     if verbose:
         print('\n', T, '\n')
@@ -98,6 +85,22 @@ def solve(A, b, c, verbose):
                                                 [-1]) > tolerance else 0.0
 
     return (list(result), T[-1][-1])
+
+
+def construct_simplex_tableau(A, b, c):
+    n = len(A) + 1
+    m = len(A[0]) + len(b) + 1
+    T = np.zeros((n, m), dtype=float)
+    for i in range(len(A)):
+        for j in range(len(A[0])):
+            T[i][j] = A[i][j]
+    for i in range(len(A[0])):
+        T[i][len(A[0]) + i] = 1
+    for i in range(len(b)):
+        T[i][len(A[0]) + len(b)] = b[i]
+    for i in range(len(c)):
+        T[len(A)][i] = -c[i]
+    return T, m, n
 
 
 def find_enter_variable(T_z):

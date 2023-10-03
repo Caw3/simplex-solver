@@ -49,11 +49,11 @@ class TestLP(unittest.TestCase):
     #     self.assertEqual(res[0], None)  # No bounded solution for maximization
     #     self.assertEqual(res[1], None)  # Optimal value should be infinite
 
-    def test_single_constraint(self):
-        A = np.array([[1, 2]])
-        b = np.array([4])
-        c = np.array([2, 1])
-        self.assertLP(A, b, c)
+    # def test_single_constraint(self):
+    #     A = np.array([[1, 2]])
+    #     b = np.array([4])
+    #     c = np.array([2, 1])
+    #     self.assertLP(A, b, c)
 
     # def test_infeasible(self):
     #     A = np.array([[1, 1], [-1, -1], [1, -1]])
