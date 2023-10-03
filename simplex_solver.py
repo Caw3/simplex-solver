@@ -26,12 +26,11 @@ def parse_command_line_args() -> argparse.Namespace:
 
 
 # TODO: when 0... is not a BFS
-def solve(A: np.ndarray, b: np.ndarray, c: np.ndarray, verbose: bool) -> \
+def solve(A: np.ndarray, b: np.ndarray, c: np.ndarray, verbose: bool = False) -> \
         tuple[None, None] | tuple[list[Any], np.ndarray[Any, Any]]:
     T, m, n = construct_simplex_tableau(A, b, c)
 
-    if verbose:
-        print('\n', T, '\n')
+    log(verbose, '\n', T, '\n')
 
     tolerance = 1e-9
     curr_iter = 0
@@ -45,39 +44,35 @@ def solve(A: np.ndarray, b: np.ndarray, c: np.ndarray, verbose: bool) -> \
             break
 
         if curr_iter >= 10000:
-            if verbose:
-                print("Max iterations reached")
+            log(verbose, "Max iterations reached")
             return (None, None)
 
         pivot_col_i = find_enter_variable(T_z)
         pivot_row_i = find_exit_variable(T, pivot_col_i, b)
 
         if pivot_row_i is None:
-            if verbose:
-                print("No Feasible Solution")
+            log(verbose, "No Feasible Solution")
             return (None, None)
 
         pivot_elem = T[pivot_row_i][pivot_col_i]
         assert pivot_elem != 0
         T[pivot_row_i] = T[pivot_row_i] / pivot_elem
 
-        if verbose:
-            print("Pivot element (row, col): " +
-                  str((pivot_row_i, pivot_col_i)))
-            print('R_' + str(pivot_row_i) + ' / ' +
-                  str(pivot_elem) + ' -> R_' + str(pivot_row_i))
+        log(verbose, "Pivot element (row, col): " + str((pivot_row_i, pivot_col_i)))
+        log(verbose, 'R_' + str(pivot_row_i) + ' / ' + str(pivot_elem) + ' -> R_' + str(pivot_row_i))
 
         for i, row in enumerate(T):
             if i == pivot_row_i or abs(T[i][pivot_col_i]) <= tolerance:
                 continue
             else:
-                if verbose:
-                    print('-R_' + str(pivot_row_i) + ' * ' +
-                          str(T[i][pivot_col_i]) + ' + ' + 'R_' + str(i) + ' -> R_' + str(i))
+                log(verbose, '-R_' + str(pivot_row_i)
+                    + ' * ' + str(T[i][pivot_col_i])
+                    + ' + ' + 'R_' + str(i) + ' -> R_' + str(i))
+
                 T[i] = T[i] - (T[pivot_row_i] * T[i][pivot_col_i])
 
-        if verbose:
-            print('\n', T, '\n')
+        log(verbose, '\n', T, '\n')
+
 
     result = np.zeros(len(c), dtype=float)
     for j in range(len(c)):
@@ -87,6 +82,11 @@ def solve(A: np.ndarray, b: np.ndarray, c: np.ndarray, verbose: bool) -> \
                                                 [-1]) > tolerance else 0.0
 
     return (list(result), T[-1][-1])
+
+
+def log(verbose: bool, *args, **kwargs):
+    if verbose:
+        print(*args, **kwargs)
 
 
 def construct_simplex_tableau(A: np.ndarray, b: np.ndarray, c: np.ndarray) -> Tuple[np.ndarray, int, int]:
